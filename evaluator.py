@@ -41,7 +41,7 @@ class Evaluator:
         hint = reponse['hint']
         game_round = GameRound(hint=hint)
         if sleep: time.sleep(1)
-        game_round.predictions = self.classifier.classify(hint, complexity=2)
+        game_round.predictions = self.classifier.classify(hint, complexity=round_id)
         game_round.answer = self.extract_round_prediction(current_predictions=game_round.predictions)
         verdict = self.api_client.send_answer_for_current_company(prediction=game_round.answer)
         game_round.score = verdict["score"]
