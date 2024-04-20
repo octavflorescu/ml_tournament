@@ -17,7 +17,11 @@ class NAICSClassifier:
         self.naics3_target = pd.read_csv(f"{DATA_PATH}/naics3_augmented.csv")
         self.naics3_choices = self.naics3_target.naics_label.tolist()
 
-    def classify(self, hint):
+    def classify(self, hint, complexity=2):
+        """
+        complexity 1 for round 1, company name: use only untokenized features 
+        any complexity above, will use more features. e.g. tokenized summary
+        """
 
         sample0tags = [
             hint
@@ -45,13 +49,14 @@ class NAICSClassifier:
             for choise, choise_score in choisez:
                 idx = np.where(self.naics3_target["naics_label"] == choise)[0][0]
                 naics3_confidences[idx] += choise_score*0.01
-                
-            for tok, counts in Counter(tokenized_feature).items():
-                for idx, row in self.naics3_target.iterrows():
-                    if str(tok) in Counter(row['Mistral7Bv01_tokenized_name'].split("|")).keys():
-                        naics3_confidences[idx] += 0.5
-                    if str(tok) in Counter(row['Mistral7Bv01_tokenized_description'].split("|")).keys():
-                        naics3_confidences[idx] += 0.5
+            
+            if complexity > 1:
+                for tok, counts in Counter(tokenized_feature).items():
+                    for idx, row in self.naics3_target.iterrows():
+                        if str(tok) in Counter(row['Mistral7Bv01_tokenized_name'].split("|")).keys():
+                            naics3_confidences[idx] += 0.5
+                        if str(tok) in Counter(row['Mistral7Bv01_tokenized_description'].split("|")).keys():
+                            naics3_confidences[idx] += 0.5
 
         best_match_naics3_counts = 0
         for idx, current_naics3_match_counts in enumerate(naics3_confidences):

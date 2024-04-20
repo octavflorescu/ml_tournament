@@ -20,9 +20,9 @@ class APIClient:
         answer_object = {
             "answer": prediction
         }
-
+        print("Answered", answer_object)
         response = requests.post("{0}/evaluate/answer".format(self.api_url), json=answer_object, headers=self.headers)
-        print(response.status_code, response.json())
+        print("Verdict", response.status_code, response.json())
 
         return response.json()
 
@@ -31,3 +31,4 @@ class APIClient:
     def get_next_hint_for_current_company(self):
         response = requests.get("{0}/evaluate/hint".format(self.api_url), headers=self.headers)
         print(response.status_code, response.json())
+        return response.json()
