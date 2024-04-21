@@ -64,7 +64,7 @@ class NAICSClassifier:
             for wrd in summary_feature:
                 for idx, row in self.naics3_target.iterrows():
                     if wrd.lower() in row['naics_label'].lower():
-                        naics3_confidences[idx] += 0.25
+                        naics3_confidences[idx] += 0.25 # if complexity > 1 else 25
                     elif wrd.lower() in row['description'].lower():
                         naics3_confidences[idx] += 0.1
                 
