@@ -27,18 +27,18 @@ class Evaluator:
         self.classifier = NAICSClassifier(tokenizer=self.tokenizer, DATA_PATH=DATA_PATH)
         self.api_client = api_client
 
-    def evaluate(self): 
+    def evaluate(self, sleep=False): 
         self.rounds = []
         # Round 1
-        self.rounds.append(self.do_round(round_id=1, sleep=True))
+        self.rounds.append(self.do_round(round_id=1, sleep=sleep))
         # Round 2
-        self.rounds.append(self.do_round(round_id=2, sleep=True))
+        self.rounds.append(self.do_round(round_id=2, sleep=sleep))
         # Round 3
-        self.rounds.append(self.do_round(round_id=3, sleep=True))
+        self.rounds.append(self.do_round(round_id=3, sleep=sleep))
         # Round 4
-        self.rounds.append(self.do_round(round_id=4, sleep=True))
+        self.rounds.append(self.do_round(round_id=4, sleep=sleep))
         # Round 5
-        self.rounds.append(self.do_round(round_id=5, sleep=True))
+        self.rounds.append(self.do_round(round_id=5, sleep=sleep))
         self.api_client.reset_current_context()
 
     def do_round(self, round_id=1, sleep=False):

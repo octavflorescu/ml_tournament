@@ -29,6 +29,6 @@ class APIClient:
     # Get a new hint for current company.
     # Get the first hint for a new company after calling /evaluate/reset.
     def get_next_hint_for_current_company(self):
-        response = requests.get("{0}/evaluate/hint".format(self.api_url), headers=self.headers)
+        response = requests.get("{0}/evaluate/hint".format(self.api_url), headers=self.headers, timeout=None)
         print(response.status_code, response.json())
         return response.json()
