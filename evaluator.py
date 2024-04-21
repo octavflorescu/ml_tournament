@@ -52,6 +52,14 @@ class Evaluator:
         game_round.score = verdict["score"]
         if sleep: time.sleep(1)
         return game_round
+    
+    def compete(self, round_id=1, sleep=False):
+        if round_id == 1:
+            self.rounds = []
+        # Round 1
+        self.rounds.append(self.do_round(round_id=1, sleep=sleep))
+        if round_id == 5:
+            self.api_client.reset_current_context()
 
     def extract_round_prediction(self, current_predictions):
         naics3_scores = np.zeros(len(self.classifier.naics3_choices))
