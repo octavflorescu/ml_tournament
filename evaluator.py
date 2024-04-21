@@ -24,7 +24,7 @@ class Evaluator:
         model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1", device_map="auto", load_in_4bit=True, cache_dir=cache_dir)
         tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1", padding_side="left", cache_dir=cache_dir)
         self.tokenizer = TokenizerWrapper(tokenizer, model)
-        self.classifier = NAICSClassifier(tokenizer=self.tokenizer, DATA_PATH=DATA_PATH)
+        self.classifier = NAICSClassifier(tokenizer=self.tokenizer, DATA_PATH=DATA_PATH, naics_categories_path=f'{DATA_PATH}/NAICS3_with_merged_Subcategories.csv')
         self.api_client = api_client
 
     def evaluate(self, sleep=False): 

@@ -65,7 +65,9 @@ class NAICSClassifier:
                 for idx, row in self.naics3_target.iterrows():
                     if wrd.lower() in row['naics_label'].lower():
                         naics3_confidences[idx] += 0.25 # if complexity > 1 else 25
-                    elif wrd.lower() in row['description'].lower():
+                    if 'subcategories' in row and (wrd.lower() in row['subcategories'].lower()):
+                        naics3_confidences[idx] += 0.15
+                    if wrd.lower() in row['description'].lower():
                         naics3_confidences[idx] += 0.1
                 
             choisez = process.extract(feature, self.naics3_choices, limit=5)  # => [('Health and Personal Care Retailers', 55), ('Water Transportation', 52), ('Real Estate', 51), ('Gasoline Stations and Fuel Dealers', 48), ('Specialty Trade Contractors', 47)]
@@ -77,9 +79,11 @@ class NAICSClassifier:
                 for tok, counts in Counter(tokenized_feature).items():
                     for idx, row in self.naics3_target.iterrows():
                         if str(tok) in Counter(row['Mistral7Bv01_tokenized_name'].split("|")).keys():
-                            naics3_confidences[idx] += 0.5
+                            naics3_confidences[idx] += 0.25
+                        if 'Mistral7Bv01_tokenized_subcats' in row and (wrd.lower() in row['Mistral7Bv01_tokenized_subcats'].lower()):
+                            naics3_confidences[idx] += 0.15
                         if str(tok) in Counter(row['Mistral7Bv01_tokenized_description'].split("|")).keys():
-                            naics3_confidences[idx] += 0.5
+                            naics3_confidences[idx] += 0.1
 
         best_match_naics3_counts = 0
         for idx, current_naics3_match_counts in enumerate(naics3_confidences):
