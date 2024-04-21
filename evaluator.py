@@ -1,7 +1,8 @@
 import time
 import numpy as np
 
-from classifier import NAICSClassifier
+from classifier import NAICSClassifier, TokenizerWrapper
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class GameRound():
@@ -19,7 +20,11 @@ class Evaluator:
                  DATA_PATH='/content/ml_tournament/resources/'):
         self.api_url = api_url
         self.api_key = api_key
-        self.classifier = NAICSClassifier(cache_dir=cache_dir, DATA_PATH=DATA_PATH)
+        
+        model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1", device_map="auto", load_in_4bit=True, cache_dir=cache_dir)
+        tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1", padding_side="left", cache_dir=cache_dir)
+        self.tokenizer = TokenizerWrapper(tokenizer, model)
+        self.classifier = NAICSClassifier(tokenizer=self.tokenizer, DATA_PATH=DATA_PATH)
         self.api_client = api_client
 
     def evaluate(self): 
