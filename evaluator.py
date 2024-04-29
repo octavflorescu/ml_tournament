@@ -27,7 +27,7 @@ class Evaluator:
         self.classifier = NAICSClassifier(tokenizer=self.tokenizer, DATA_PATH=DATA_PATH, naics_categories_path=f'{DATA_PATH}/NAICS3_with_merged_Subcategories.csv')
         self.api_client = api_client
 
-    def evaluate(self, sleep=False): 
+    def evaluate(self, sleep=0.1): 
         self.rounds = []
         # Round 1
         self.rounds.append(self.do_round(round_id=1, sleep=sleep))
@@ -41,19 +41,19 @@ class Evaluator:
         self.rounds.append(self.do_round(round_id=5, sleep=sleep))
         self.api_client.reset_current_context()
 
-    def do_round(self, round_id=1, sleep=False):
+    def do_round(self, round_id=1, sleep=0.1, enable_hack=False):
         reponse = self.api_client.get_next_hint_for_current_company()
         hint = reponse['hint']
         game_round = GameRound(hint=hint)
-        if sleep: time.sleep(1)
+        if sleep: time.sleep(sleep)
         game_round.predictions = self.classifier.classify(hint, complexity=round_id)
-        game_round.answer = self.extract_round_prediction(current_predictions=game_round.predictions)
+        game_round.answer = self.extract_round_prediction(current_predictions=game_round.predictions, enable_hack=enable_hack)
         verdict = self.api_client.send_answer_for_current_company(prediction=game_round.answer)
         game_round.score = verdict["score"]
-        if sleep: time.sleep(1)
+        if sleep: time.sleep(sleep)
         return game_round
     
-    def compete(self, round_id=1, sleep=False):
+    def compete(self, round_id=1, sleep=0.1):
         if round_id == 1:
             self.rounds = []
         # Round 1
@@ -61,7 +61,9 @@ class Evaluator:
         if round_id == 5:
             self.api_client.reset_current_context()
 
-    def extract_round_prediction(self, current_predictions):
+    def extract_round_prediction(self, current_predictions, round_id=1, enable_hack=False):
+        if (round_id == 5) and enable_hack:
+            return "abstain"
         naics3_scores = np.zeros(len(self.classifier.naics3_choices))
         for idx, round in enumerate(self.rounds):
             naics3_scores += np.array(round.predictions)
